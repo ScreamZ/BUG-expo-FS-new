@@ -26,26 +26,35 @@ export const FS = {
       }
     }
   },
-  deleteDirectoryContentRecursively: (directory: Directory) => {
-    if (!directory.exists) return;
+  /**
+   * Delete a directory and its content
+   *
+   * @param directory
+   * @param __do_not_use_internal__isRecursiveCall -- Do not used, internal parameter
+   * @returns
+   */
+  deleteDirectoryContentRecursively: (
+    directory: Directory,
+    __do_not_use_internal__isRecursiveCall = false
+  ) => {
+    if (!directory.exists)
+      return console.log(`Directory ${directory.uri} does not exist`);
 
     const contents = directory.list();
 
     for (const item of contents) {
       if (item instanceof Directory) {
-        FS.deleteDirectoryContentRecursively(item);
+        FS.deleteDirectoryContentRecursively(item, true);
         item.delete();
       } else {
         item.delete();
       }
     }
 
-    try {
-      directory.exists && directory.delete();
-    } catch (e) {
-      // Silently
-      // TODO: See https://github.com/expo/expo/issues/34542
-    }
+    // Forced to do that, because the API marked synchronous but seems not ?
+    directory.exists &&
+      !__do_not_use_internal__isRecursiveCall &&
+      directory.delete();
   },
   /**
    * Print the directory in the console for debugging purposes.
