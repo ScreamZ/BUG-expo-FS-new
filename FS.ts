@@ -39,6 +39,13 @@ export const FS = {
         item.delete();
       }
     }
+
+    try {
+      directory.exists && directory.delete();
+    } catch (e) {
+      // Silently
+      // TODO: See https://github.com/expo/expo/issues/34542
+    }
   },
   /**
    * Print the directory in the console for debugging purposes.
